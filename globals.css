@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-abyss text-foam font-body antialiased;
+    background-image:
+      radial-gradient(ellipse 70% 40% at 50% -5%, rgba(62, 208, 184, 0.07), transparent);
+  }
+
+  ::selection {
+    @apply bg-signal/30 text-foam;
+  }
+
+  *:focus-visible {
+    outline: 2px solid #3ED0B8;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .hairline {
+    @apply border-border border-t;
+  }
+}
+
+@keyframes pulse-signal {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.pulse-dot {
+  animation: pulse-signal 2s ease-in-out infinite;
+}
