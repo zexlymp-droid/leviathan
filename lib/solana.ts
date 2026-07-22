@@ -37,7 +37,47 @@ export async function getSolPriceUsd(): Promise<number | null> {
   return priceInfo?.priceUsd ?? null;
 }
 
-export type HeliusTransfer = {
+export type TrendingToken = {
+  mint: string;
+  symbol: string;
+  priceUsd: number | null;
+  liquidityUsd: number | null;
+  volume24hUsd: number | null;
+};
+
+// DexScreener's official "boosted tokens" endpoint — free, no API key.
+// This reflects tokens currently being promoted/boosted, which is the closest
+// free, documented signal to "trending" without needing a paid API.
+export async function getTrendingSolanaTokens(limit = 10): Promise<TrendingToken[]> {
+  const res = await fetch("https://api.dexscreener.com/token-boosts/top/v1");
+  if (!res.ok) throw new Error("Gagal mengambil daftar token trending.");
+  const boosts = await res.json();
+
+  const solanaMints: string[] = boosts
+    .filter((b: any) => b.chainId === "solana")
+    .map((b: any) => b.tokenAddress)
+    .slice(0, limit);
+
+  const results: TrendingToken[] = [];
+  for (const mint of solanaMints) {
+    try {
+      const priceInfo = await getDexScreenerPrice(mint);
+      if (priceInfo) {
+        results.push({
+          mint,
+          symbol: priceInfo.tokenSymbol,
+          priceUsd: priceInfo.priceUsd,
+          liquidityUsd: priceInfo.liquidityUsd,
+          volume24hUsd: priceInfo.volume24hUsd,
+        });
+      }
+    } catch {
+      // Skip tokens that fail to resolve — don't let one bad token break the whole list
+      continue;
+    }
+  }
+  return results;
+}
   mint?: string;
   tokenAmount?: number;
   fromUserAccount?: string;
