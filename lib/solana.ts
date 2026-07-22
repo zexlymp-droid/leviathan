@@ -78,6 +78,8 @@ export async function getTrendingSolanaTokens(limit = 10): Promise<TrendingToken
   }
   return results;
 }
+
+export type HeliusTransfer = {
   mint?: string;
   tokenAmount?: number;
   fromUserAccount?: string;
