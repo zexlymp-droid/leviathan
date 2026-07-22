@@ -31,6 +31,7 @@ function shortAddr(addr: string) {
 
 export default function WhaleScan() {
   const [mint, setMint] = useState("");
+  const [threshold, setThreshold] = useState("10000");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [alerts, setAlerts] = useState<Alert[] | null>(null);
@@ -47,7 +48,7 @@ export default function WhaleScan() {
       const res = await fetch("/api/whale-scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mint: mint.trim() }),
+        body: JSON.stringify({ mint: mint.trim(), threshold: parseFloat(threshold) || 10000 }),
       });
       const data = await res.json();
 
@@ -81,7 +82,7 @@ export default function WhaleScan() {
 
       <TrendingList onSelect={(mint) => setMint(mint)} />
 
-      <div className="flex flex-col sm:flex-row gap-2 mb-6">
+      <div className="flex flex-col sm:flex-row gap-2 mb-3">
         <input
           value={mint}
           onChange={(e) => setMint(e.target.value)}
@@ -95,6 +96,17 @@ export default function WhaleScan() {
         >
           {loading ? "Memindai…" : "Scan Whale →"}
         </button>
+      </div>
+
+      <div className="flex items-center gap-2 mb-6">
+        <label className="text-xs text-muted font-mono">Ambang whale (USD)</label>
+        <input
+          value={threshold}
+          onChange={(e) => setThreshold(e.target.value)}
+          type="number"
+          step="1000"
+          className="w-28 bg-surface border border-border rounded px-2 py-1 text-xs font-mono text-foam outline-none focus:border-signal/50"
+        />
       </div>
 
       {error && <p className="text-alert text-sm mb-6">{error}</p>}
@@ -116,7 +128,7 @@ export default function WhaleScan() {
 
       {alerts && alerts.length === 0 && recommendations?.length === 0 && !loading && (
         <p className="text-sm text-muted italic">
-          Tidak ada whale transaction ≥ $100.000 terdeteksi di 50 transaksi terakhir pool ini.
+          Tidak ada whale transaction ≥ ${parseFloat(threshold).toLocaleString("id-ID")} terdeteksi di 50 transaksi terakhir pool ini.
         </p>
       )}
 
