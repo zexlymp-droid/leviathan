@@ -4,7 +4,7 @@ import { getDexScreenerPrice, getSolPriceUsd, getPoolSwaps } from "@/lib/solana"
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-const WHALE_THRESHOLD_USD = 100_000;
+const DEFAULT_WHALE_THRESHOLD_USD = 10_000;
 
 // Simple in-memory rate limiter, same pattern as /api/enhance.
 const RATE_LIMIT = 10;
@@ -55,13 +55,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { mint } = await req.json();
+    const { mint, threshold } = await req.json();
     if (!mint || typeof mint !== "string") {
       return NextResponse.json(
         { error: "Alamat token (mint address) wajib diisi." },
         { status: 400 }
       );
     }
+    const whaleThreshold =
+      typeof threshold === "number" && threshold > 0 ? threshold : DEFAULT_WHALE_THRESHOLD_USD;
 
     // 1. Harga & pool dari DexScreener (data nyata, bukan dari AI)
     const priceInfo = await getDexScreenerPrice(mint.trim());
@@ -110,7 +112,7 @@ export async function POST(req: NextRequest) {
         };
       })
       .filter((tx): tx is NonNullable<typeof tx> => tx !== null)
-      .filter((tx) => tx.transaction_value_usd >= WHALE_THRESHOLD_USD);
+      .filter((tx) => tx.transaction_value_usd >= whaleThreshold);
 
     // 4. Data terkurasi dikirim ke AI hanya untuk narasi + confidence, bukan angka baru
     const dataForModel = {
