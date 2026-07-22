@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import TrendingList from "./TrendingList";
 
 type Alert = {
   token: string;
@@ -77,6 +78,8 @@ export default function WhaleScan() {
           Selalu verifikasi sendiri sebelum mengambil keputusan trading.
         </p>
       </div>
+
+      <TrendingList onSelect={(mint) => setMint(mint)} />
 
       <div className="flex flex-col sm:flex-row gap-2 mb-6">
         <input
