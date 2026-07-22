@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { WalletMultiButton as WalletMultiButtonRaw } from "@solana/wallet-adapter-react-ui";
+// Same type-declaration mismatch as WalletProvider.tsx — cast to sidestep it.
+const WalletMultiButton = WalletMultiButtonRaw as any;
 import WalletProvider from "@/components/WalletProvider";
 import WhaleScan from "@/components/WhaleScan";
 import WatchlistManager from "@/components/WatchlistManager";
