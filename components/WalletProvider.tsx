@@ -19,11 +19,20 @@ export default function WalletProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  // Cast to `any` here: @solana/wallet-adapter-react's component types were
+  // written against an older React type signature, which conflicts with
+  // newer @types/react's stricter FC return type (ReactNode | Promise<ReactNode>).
+  // This is purely a type-declaration mismatch, not a runtime bug — these
+  // components work fine, so we sidestep the type checker at this one spot.
+  const AnyConnectionProvider = ConnectionProvider as any;
+  const AnySolanaWalletProvider = SolanaWalletProvider as any;
+  const AnyWalletModalProvider = WalletModalProvider as any;
+
   return (
-    <ConnectionProvider endpoint={endpoint}>
-      <SolanaWalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>{children}</WalletModalProvider>
-      </SolanaWalletProvider>
-    </ConnectionProvider>
+    <AnyConnectionProvider endpoint={endpoint}>
+      <AnySolanaWalletProvider wallets={wallets} autoConnect>
+        <AnyWalletModalProvider>{children}</AnyWalletModalProvider>
+      </AnySolanaWalletProvider>
+    </AnyConnectionProvider>
   );
 }
