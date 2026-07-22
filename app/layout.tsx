@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter, IBM_Plex_Mono } from "next/font/google";
+import WalletProvider from "@/components/WalletProvider";
+import Navbar from "@/components/Navbar";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -36,7 +38,12 @@ export default function RootLayout({
       lang="id"
       className={`${spaceGrotesk.variable} ${inter.variable} ${plexMono.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <WalletProvider>
+          <Navbar />
+          {children}
+        </WalletProvider>
+      </body>
     </html>
   );
 }
